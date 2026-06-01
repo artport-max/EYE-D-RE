@@ -86,7 +86,7 @@ reid:
   batch_size: 64
   # HAC(Hierarchical Agglomerative Clustering) 하이퍼파라미터
   clustering:
-    threshold: 0.25 # Cosine Distance 병합 임계치 (높을수록 더 쉽게 병합됨, 낮을수록 보수적)
+    threshold: 0.12 # Cosine Distance 병합 임계치 (높을수록 더 쉽게 병합됨, 낮을수록 보수적)
     metric: "cosine"
     linkage: "average" # average | complete | single
 
