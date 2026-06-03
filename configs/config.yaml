@@ -89,6 +89,7 @@ reid:
     threshold: 0.12 # Cosine Distance 병합 임계치 (높을수록 더 쉽게 병합됨, 낮을수록 보수적)
     metric: "cosine"
     linkage: "average" # average | complete | single
+    allow_cross_slot: false # false면 다른 시간대(slot) 병합 금지 - over-merge 방지(권장)
 
 # --- Market-1501 포맷 변환 (Phase 1F) ---
 market1501:

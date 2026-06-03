@@ -141,6 +141,7 @@ class CrossCameraMerger:
         self.threshold = cluster_cfg.get("threshold", 0.5)
         self.metric = cluster_cfg.get("metric", "cosine")
         self.linkage_method = cluster_cfg.get("linkage", "average")
+        self.allow_cross_slot = cluster_cfg.get("allow_cross_slot", False)
         
         self.extractor = None
 
@@ -238,6 +239,9 @@ class CrossCameraMerger:
 
     def _has_conflict(self, t1: Dict, t2: Dict) -> bool:
         """두 트랙렛이 must-not-link 관계인지 확인 (동일 cam+slot + 프레임 겹침)."""
+        # 시간대 교차 병합 금지(over-merge 방지)
+        if not self.allow_cross_slot and t1["time_slot"] != t2["time_slot"]:
+            return True
         if t1["camera_id"] != t2["camera_id"] or t1["time_slot"] != t2["time_slot"]:
             return False
         f1_min, f1_max = min(t1["frame_indices"]), max(t1["frame_indices"])
@@ -335,6 +339,12 @@ class CrossCameraMerger:
             
             for j in range(i + 1, n):
                 t2 = tracklets[j]
+                # (신규) 시간대 교차 병합 금지 (over-merge 방지)
+                if not self.allow_cross_slot and slot1 != t2["time_slot"]:
+                    constrained_matrix[i, j] = 999.0
+                    constrained_matrix[j, i] = 999.0
+                    constraint_count += 1
+                    continue
                 # 동일 카메라 및 동일 슬롯인지 확인
                 if cam1 == t2["camera_id"] and slot1 == t2["time_slot"]:
                     # 프레임 구간이 겹치는지 체크
